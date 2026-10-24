@@ -1,24 +1,21 @@
-import { LayoutDashboard } from 'lucide-react';
-import {Link} from 'react-router-dom'
+import React from "react";
+import { Link } from "react-router-dom";
 
-const ButtonDashboardHistory = (props) => {
+const ButtonDashboardHistory = ({ link, logo, button, active }) => {
   return (
-    <div>
-        <div>
-            <Link to={props.link}>
+    <Link to={link}>
+      <button
+        className={`px-3 py-1.5 flex items-center gap-1.5 text-xs sm:text-sm font-semibold rounded-xl cursor-pointer transition ${
+          active
+            ? "bg-indigo-600 text-white shadow-sm"
+            : "text-gray-400 hover:text-white hover:bg-gray-900"
+        }`}
+      >
+        {logo}
+        <span>{button}</span>
+      </button>
+    </Link>
+  );
+};
 
-            <button 
-                className='py-1.5 flex gap-1 font-bold text-white w-35 
-                justify-center rounded-lg cursor-pointer hover:bg-gray-700
-                focus:outline-none focus:bg-indigo-400 active:bg-indigo-400"  '>
-                {props.logo}{props.button}
-            </button>
-            
-            </Link>
-        </div>
-      
-    </div>
-  )
-}
-
-export default ButtonDashboardHistory
+export default ButtonDashboardHistory;

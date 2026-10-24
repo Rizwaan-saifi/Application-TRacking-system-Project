@@ -21,4 +21,51 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+export const authService = {
+  login: async (email, password) => {
+    const res = await api.post("/user/login", { email, password });
+    if (res.data.token) {
+      localStorage.setItem("token", res.data.token);
+    }
+    return res.data;
+  },
+  register: async (name, email, password) => {
+    const res = await api.post("/user/register", { name, email, password });
+    return res.data;
+  },
+  isAuth: async () => {
+    const res = await api.get("/user/is_auth");
+    return res.data;
+  },
+  logout: () => {
+    localStorage.removeItem("token");
+  },
+};
+
+export const resumeService = {
+  getSample: async () => {
+    const res = await api.get("/resume/sample");
+    return res.data;
+  },
+  analyzeJSON: async (payload) => {
+    const res = await api.post("/resume/analyze", payload);
+    return res.data;
+  },
+  analyzeFile: async (formData) => {
+    const res = await axios.post(`${API_BASE_URL}/resume/analyze-file`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        ...(localStorage.getItem("token")
+          ? { Authorization: `Bearer ${localStorage.getItem("token")}` }
+          : {}),
+      },
+    });
+    return res.data;
+  },
+  getHistory: async () => {
+    const res = await api.get("/resume/history");
+    return res.data;
+  },
+};
+
 export default api;

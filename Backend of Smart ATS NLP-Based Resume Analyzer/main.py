@@ -6,7 +6,9 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from src.Utils.Database.db import Base, engine
 from src.Utils.Database.Settings import setting
 import src.Models.UserModel
+import src.Models.AnalysisModel
 from src.Routers.UserRouter import use_routes
+from src.Routers.ResumeRouter import resume_router
 
 
 @asynccontextmanager
@@ -47,6 +49,7 @@ app.add_middleware(
 )
 
 app.include_router(use_routes)
+app.include_router(resume_router)
 
 
 @app.get("/", tags=["Health"])

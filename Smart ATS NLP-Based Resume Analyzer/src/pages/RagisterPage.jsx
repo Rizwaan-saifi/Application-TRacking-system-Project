@@ -1,146 +1,182 @@
-import React from 'react'
+import React, { useState } from 'react';
 import { Form, Star } from 'lucide-react';
 import NavCard from '../componets/NavCard';
 import FormCard from '../componets/RegisterPage/FormCard';
-import { Link } from 'react-router-dom';
-import { useState } from "react";
-import axios from "axios";
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const RagisterPage = () => {
+  const navigate = useNavigate();
 
-     
-      const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        password: '',
-        ConfirmPassword: ''
-      })
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    ConfirmPassword: ''
+  });
 
-      const [error, setError] = useState("");
-      const [message, setMessage] = useState("");
-     
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
-     const handleChange =  (e) => {
-      setFormData({
-        ...formData,
-        [e.target.name]: e.target.value
-      })
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (formData.password !== formData.ConfirmPassword) {
+      setError("Passwords do not match");
+      return;
+    } else {
+      setError("");
     }
 
-    const handleSubmit = async (e) => {
-      e.preventDefault()
-
-      if (formData.password !== formData.ConfirmPassword) {
-        setError("Passwords do not match");
-        return;
-      } else {
-        setError("");
+    try {
+      const res = await axios.post(
+        "http://127.0.0.1:8000/user/register",
+        formData
+      );
+      if (res.data.email === formData.email || res.status === 201) {
+        setMessage("User registered successfully! Redirecting to login...");
+        setFormData({
+          name: '',
+          email: '',
+          password: '',
+          ConfirmPassword: ''
+        });
+        setTimeout(() => {
+          navigate("/login");
+        }, 1500);
       }
-      
-      try {
-        const res = await axios.post(
-          "http://127.0.0.1:8000/user/register",
-
-          formData
-        );
-        if (res.data.email === formData.email){
-          setMessage("User registered successfully");
-          setFormData({
-            name: '',
-            email: '',
-            password: '',
-            ConfirmPassword: ''
-          })
-          const setime = setTimeout(()=>{
-            setMessage("");
-          }, 3000)
-        }
-        
-      }
-      catch (error) {
-        const backendMessage =
-          typeof error.response?.data?.detail === "string"
+    } catch (error) {
+      const backendMessage =
+        typeof error.response?.data?.detail === "string"
           ? error.response.data.detail
           : error.response?.data?.detail?.[0]?.msg || "Something went wrong";
-        setError(backendMessage);
-      }
+      setError(backendMessage);
     }
-     
-
-
+  };
 
   return (
-    <div >
-      <div 
-        className='flex flex-col md:flex-row h-full   '>
-
-        <div 
-            className='bg-orange-600 sm:bg-lime-500 md:bg-indigo-700 lg:bg-green-300 xl:bg-gray-950 
-            order-2 md:order-1   w-[62.5vw] flex items-center justify-center'
-          >
- 
-          <div 
-              className= 'bg-gray-900/90 flex flex-col rounded-3xl text-white md:h-[52%] md:w-[75%] lg:h-[56%] xl:h-[58%] lg:w-[55%] xl:w-[49.3%] border-l-3 border-violet-500'>
-
-            <div className='bg-indigo-400 ml-12 -mt-3 flex w-fit py-2 px-8 gap-1 rounded-3xl'>
-              <Star size={16} strokeWidth={2} absoluteStrokeWidth />            
-              <Star size={16} strokeWidth={2} absoluteStrokeWidth />
-              <Star size={16} strokeWidth={2} absoluteStrokeWidth />
-              <Star size={16} strokeWidth={2} absoluteStrokeWidth />
+    <div>
+      <div className='flex flex-col md:flex-row h-full min-h-screen'>
+        {/* left card of register page */}
+        <div className='bg-slate-900 border-r border-gray-700/50 w-full md:w-1/2 p-6 md:p-12 flex flex-col justify-between'>
+          <NavCard />
+          <div className='max-w-md mx-auto my-auto py-12'>
+            <div className='flex items-center gap-2 mb-4'>
+              <div className='flex text-amber-400'>
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className='w-5 h-5 fill-current' />
+                ))}
+              </div>
+              <span className='text-xs font-semibold text-gray-400'>Trusted by 10,000+ candidates</span>
             </div>
+            <h2 className='text-3xl font-extrabold text-white mb-4'>
+              Transform Your Job Search with Advanced ATS Intelligence
+            </h2>
+            <p className='text-gray-400 text-sm leading-relaxed mb-6'>
+              Analyze candidate resumes with our custom 3-tier matching engine: Exact keywords, dense vector semantic embeddings, and deep LLM contextual alignment.
+            </p>
+          </div>
+          <div className='text-xs text-gray-500'>
+            © 2026 Smart ATS Project. Enterprise-grade resume optimization.
+          </div>
+        </div>
 
-            <h3 className=' md:text-[2.8vw] lg:text-[2.7vw] font-extrabold mt-[9%] ml-[9%] text-violet-500'>"An absolute game-changer."</h3>
-            <p className='lg:text-[109%] xl:text-[110%] px-[11%] md:mt-[8%] lg:mt-[6%] text-gray-400'>I applied to 50 jobs with no response. After using ResuMatch to tailor my keywords, I got 5 interviews in one week.</p>
+        {/* right card of register page */}
+        <div className='bg-slate-950 w-full md:w-1/2 p-6 md:p-12 flex flex-col justify-center'>
+          <div className='max-w-md w-full mx-auto'>
+            <h1 className='text-3xl font-extrabold text-white mb-2'>Create Account</h1>
+            <p className='text-gray-400 text-sm mb-6'>Start optimizing resumes against real ATS algorithms today.</p>
 
-            <div className='flex md:mt-[9%] lg:mt-[8%] ml-[11%] mr-[11%] pt-[5.5%] gap-7 border-t border-violet-500'>
-              <div className='bg-indigo-400 xl:py-[2vw] xl:px-[2vw] lg:py-[2.7vw] lg:px-[2.7vw] md:py-[3vw] md:px-[3vw] rounded-full '></div>
-              <div className=' md:mt-[5%] lg:mt-[2%]'>
-                <h4 className='font-semibold md:text-[1.2vw] lg:text-[1.2vw]'>Michael Chen</h4>
-                <p className=' text-[1.2vw] text-gray-400'>Senior Software Engineer</p>
+            {message && (
+              <div className='mb-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm'>
+                {message}
+              </div>
+            )}
+            {error && (
+              <div className='mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-sm'>
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className='space-y-4'>
+              <div>
+                <label className='block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1'>Full Name</label>
+                <input
+                  type='text'
+                  name='name'
+                  required
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder='e.g. Alex Johnson'
+                  className='w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition'
+                />
               </div>
 
-            </div>
-            
-          </div>
-      
-        </div>
+              <div>
+                <label className='block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1'>Email Address</label>
+                <input
+                  type='email'
+                  name='email'
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder='alex@example.com'
+                  className='w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition'
+                />
+              </div>
 
+              <div>
+                <label className='block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1'>Password (Min. 8 characters)</label>
+                <input
+                  type='password'
+                  name='password'
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder='••••••••'
+                  className='w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition'
+                />
+              </div>
 
+              <div>
+                <label className='block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1'>Confirm Password</label>
+                <input
+                  type='password'
+                  name='ConfirmPassword'
+                  required
+                  value={formData.ConfirmPassword}
+                  onChange={handleChange}
+                  placeholder='••••••••'
+                  className='w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition'
+                />
+              </div>
 
-
-        <div className='bg-violet-900  order-1 md:order-2  md:w-[vw] lg:w-0vw] xl:w-[37.5vw]'>
-
-
-
-          <div className='text-white flex flex-col items-center' >
-
-            <div className='mt-8 mr-66'>
-              <Link to="/"><NavCard /></Link>
-            </div>
-
-            <h2 className='text-[2.7vw] text-gray-900 font-extrabold mr-22 mt-11'>Create an account</h2>
-            <p className=' text-[1.11vw] mr-28 mt-3 font-semibold text-gray-400'>Start optimizing your resume for free.</p>
-
-            <form action="" className='mt-7 space-y-4' onSubmit={handleSubmit} >
-
-              <FormCard name="name" onChange={handleChange} value={formData.name} type="text" labale="Full Name" placeholder="Enter your full name"  />
-              <FormCard name="email" onChange={handleChange} value={formData.email} type="email" labale="Email address" placeholder="Example@gamail.com"  />
-              <FormCard name="password" onChange={handleChange} value={formData.password} type="password" labale="Password" placeholder="*************"  />
-              <FormCard name="ConfirmPassword" message={message} error={error} onChange={handleChange} value={formData.ConfirmPassword} type="password" labale="Confirm Password" placeholder="*************"  />
-
-              <button type="submit" className='bg-indigo-500 mt-7  py-3 px-34 rounded-xl cursor-pointer'>Create account</button>
-
+              <button
+                type='submit'
+                className='w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/20 transition cursor-pointer mt-2'
+              >
+                Create Account
+              </button>
             </form>
 
-            <p className='mt-6 mb-10 text-gray-400'>Already have an account? <Link to="/login"><button className='text-gray-900 pl-2 font-bold cursor-pointer'>Log in</button></Link></p>
-
+            <div className='text-center mt-6 text-sm text-gray-400'>
+              Already have an account?{' '}
+              <Link to='/login' className='text-indigo-400 hover:text-indigo-300 font-semibold'>
+                Sign In
+              </Link>
+            </div>
           </div>
-
         </div>
-
       </div>
-  </div>
-  )
-} 
+    </div>
+  );
+};
 
-export default RagisterPage
+export default RagisterPage;
