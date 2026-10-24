@@ -13,16 +13,26 @@ import {
   Calendar,
   Maximize2,
   FileCheck,
-  Sparkles
+  Sparkles,
+  Bookmark,
+  BookmarkCheck
 } from "lucide-react";
 
 const AtsBlueprintSection = () => {
   const [showFormatDetails, setShowFormatDetails] = useState(false);
+  const [bookmarkedRules, setBookmarkedRules] = useState({ 1: false, 2: false, 3: false });
+
+  const toggleBookmark = (id) => {
+    setBookmarkedRules((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
 
   return (
-    <section className="bg-[#090d16] text-slate-100 py-24 px-4 sm:px-6 lg:px-8 border-t border-slate-800/80">
+    <section className="bg-[#090d16] text-slate-100 py-24 px-4 sm:px-6 lg:px-8 border-t border-slate-800/80 relative">
       <div className="max-w-6xl mx-auto">
-        {/* Section Heading - Professional with refined indigo accent */}
+        {/* Section Heading */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/25 text-indigo-400 text-xs font-semibold mb-4 shadow-sm">
             <Sparkles className="w-3.5 h-3.5" />
@@ -36,77 +46,244 @@ const AtsBlueprintSection = () => {
           </p>
         </div>
 
-        {/* 3 Core Rules Boxes with Tasteful Accents */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {/* Box 1: Single-Column Text Flow */}
-          <div className="bg-[#0f1422] border border-slate-800 rounded-2xl p-6 sm:p-7 flex flex-col justify-between hover:border-indigo-500/40 hover:shadow-lg hover:shadow-indigo-500/5 transition group">
+        {/* 3 Core Rules Boxes Styled as Framer 'Card — Bookmark' */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-7 mb-10 pt-4">
+          {/* Card 1: Single-Column Text Flow */}
+          <div className="bg-[#0f1422] border border-slate-800 rounded-3xl p-6 sm:p-7 flex flex-col justify-between hover:border-indigo-500/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-500/15 group relative overflow-visible cursor-pointer">
+            {/* Hanging Bookmark Ribbon */}
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleBookmark(1);
+              }}
+              className="absolute -top-3.5 right-6 z-20 cursor-pointer group/bookmark"
+              title={bookmarkedRules[1] ? "Saved in your bookmarks" : "Click to bookmark this rule"}
+            >
+              <div
+                style={{ clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 50% 82%, 0% 100%)" }}
+                className={`w-9 h-14 sm:w-10 sm:h-16 flex flex-col items-center pt-2.5 transition-all duration-300 ease-out group-hover:translate-y-1.5 shadow-lg ${
+                  bookmarkedRules[1]
+                    ? "bg-gradient-to-b from-indigo-500 to-indigo-700 text-white shadow-indigo-500/40"
+                    : "bg-gradient-to-b from-indigo-600 to-indigo-800 text-white/90 group-hover/bookmark:from-indigo-500 group-hover/bookmark:to-indigo-700 shadow-indigo-600/30"
+                }`}
+              >
+                {bookmarkedRules[1] ? (
+                  <BookmarkCheck className="w-4 h-4 fill-current animate-bounce" />
+                ) : (
+                  <Bookmark className="w-4 h-4 transition-transform group-hover/bookmark:scale-110" />
+                )}
+                <span className="text-[9px] font-mono font-bold tracking-tighter mt-1 opacity-90">
+                  01
+                </span>
+              </div>
+            </div>
+
+            {/* Top Interactive Graphic Preview Box */}
+            <div className="bg-[#080b12] rounded-2xl p-4 border border-slate-800/80 mb-5 relative overflow-hidden group-hover:border-indigo-500/30 transition-colors">
+              <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-slate-800/80">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span className="text-[10px] font-mono text-slate-400">Layout_v1.0.docx</span>
+                </div>
+                <span className="text-[9px] font-mono text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded">
+                  Linear Flow
+                </span>
+              </div>
+              <div className="space-y-1.5">
+                <div className="h-2 w-3/4 bg-indigo-500/40 rounded transition-all duration-300 group-hover:w-5/6" />
+                <div className="h-1.5 w-full bg-slate-700/50 rounded" />
+                <div className="h-1.5 w-5/6 bg-slate-700/50 rounded" />
+                <div className="h-1.5 w-2/3 bg-slate-700/40 rounded" />
+              </div>
+            </div>
+
+            {/* Card Body */}
             <div>
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/25 flex items-center justify-center text-indigo-400 mb-5">
-                <Layers className="w-5 h-5" />
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-indigo-400">
+                  Rule 01 • Structure
+                </span>
               </div>
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-indigo-400 mb-1.5">
-                Rule 01 • Structure
-              </div>
-              <h3 className="text-lg font-serif font-medium text-white mb-2.5 group-hover:text-indigo-300 transition-colors">
+              <h3 className="text-xl font-serif font-medium text-white mb-2.5 group-hover:text-indigo-300 transition-colors">
                 Single-Column Text Flow
               </h3>
               <p className="text-slate-400 text-sm leading-relaxed mb-6 font-sans">
                 Never use multi-column templates, tables, or floating text boxes. Parsers read horizontally left-to-right across the page and will scramble your work experience and dates into unreadable text.
               </p>
             </div>
-            <div className="flex items-center gap-2 text-xs text-indigo-300 font-semibold bg-indigo-500/10 py-1.5 px-3 rounded-lg border border-indigo-500/20 w-fit">
-              <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400" />
-              <span>99.8% Parse Reliability</span>
+
+            {/* Card Footer Bar */}
+            <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs text-indigo-300 font-semibold bg-indigo-500/10 py-1.5 px-3 rounded-xl border border-indigo-500/20">
+                <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400" />
+                <span>99.8% Parse Reliability</span>
+              </div>
+              <span className="text-xs text-slate-500 group-hover:text-indigo-400 transition-colors flex items-center gap-1 font-medium">
+                {bookmarkedRules[1] ? "Bookmarked ✓" : "Save Rule"}
+              </span>
             </div>
           </div>
 
-          {/* Box 2: Categorized Skills Matrix */}
-          <div className="bg-[#0f1422] border border-slate-800 rounded-2xl p-6 sm:p-7 flex flex-col justify-between hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-500/5 transition group">
+          {/* Card 2: Categorized Skills Matrix */}
+          <div className="bg-[#0f1422] border border-slate-800 rounded-3xl p-6 sm:p-7 flex flex-col justify-between hover:border-purple-500/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-purple-500/15 group relative overflow-visible cursor-pointer">
+            {/* Hanging Bookmark Ribbon */}
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleBookmark(2);
+              }}
+              className="absolute -top-3.5 right-6 z-20 cursor-pointer group/bookmark"
+              title={bookmarkedRules[2] ? "Saved in your bookmarks" : "Click to bookmark this rule"}
+            >
+              <div
+                style={{ clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 50% 82%, 0% 100%)" }}
+                className={`w-9 h-14 sm:w-10 sm:h-16 flex flex-col items-center pt-2.5 transition-all duration-300 ease-out group-hover:translate-y-1.5 shadow-lg ${
+                  bookmarkedRules[2]
+                    ? "bg-gradient-to-b from-purple-500 to-purple-700 text-white shadow-purple-500/40"
+                    : "bg-gradient-to-b from-purple-600 to-purple-800 text-white/90 group-hover/bookmark:from-purple-500 group-hover/bookmark:to-purple-700 shadow-purple-600/30"
+                }`}
+              >
+                {bookmarkedRules[2] ? (
+                  <BookmarkCheck className="w-4 h-4 fill-current animate-bounce" />
+                ) : (
+                  <Bookmark className="w-4 h-4 transition-transform group-hover/bookmark:scale-110" />
+                )}
+                <span className="text-[9px] font-mono font-bold tracking-tighter mt-1 opacity-90">
+                  02
+                </span>
+              </div>
+            </div>
+
+            {/* Top Interactive Graphic Preview Box */}
+            <div className="bg-[#080b12] rounded-2xl p-4 border border-slate-800/80 mb-5 relative overflow-hidden group-hover:border-purple-500/30 transition-colors">
+              <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-slate-800/80">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-purple-400" />
+                  <span className="text-[10px] font-mono text-slate-400">Skills_Vector_Matrix</span>
+                </div>
+                <span className="text-[9px] font-mono text-purple-400 bg-purple-500/10 px-1.5 py-0.5 rounded">
+                  O(1) Match
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                <span className="text-[10px] font-mono bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30">
+                  Python: 100%
+                </span>
+                <span className="text-[10px] font-mono bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded border border-indigo-500/30">
+                  FastAPI: Match
+                </span>
+                <span className="text-[10px] font-mono bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30">
+                  Docker: Match
+                </span>
+              </div>
+            </div>
+
+            {/* Card Body */}
             <div>
-              <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/25 flex items-center justify-center text-purple-400 mb-5">
-                <Target className="w-5 h-5" />
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-purple-400">
+                  Rule 02 • Indexing
+                </span>
               </div>
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-purple-400 mb-1.5">
-                Rule 02 • Indexing
-              </div>
-              <h3 className="text-lg font-serif font-medium text-white mb-2.5 group-hover:text-purple-300 transition-colors">
+              <h3 className="text-xl font-serif font-medium text-white mb-2.5 group-hover:text-purple-300 transition-colors">
                 Categorized Skills Matrix
               </h3>
               <p className="text-slate-400 text-sm leading-relaxed mb-6 font-sans">
                 Technical proficiencies account for 35% of overall match scoring. Group your skills under explicit labels: Languages, Frameworks, Databases, and Tools, matching keywords verbatim from the job description.
               </p>
             </div>
-            <div className="flex items-center gap-2 text-xs text-purple-300 font-semibold bg-purple-500/10 py-1.5 px-3 rounded-lg border border-purple-500/20 w-fit">
-              <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" />
-              <span>35% Scoring Weight</span>
+
+            {/* Card Footer Bar */}
+            <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs text-purple-300 font-semibold bg-purple-500/10 py-1.5 px-3 rounded-xl border border-purple-500/20">
+                <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" />
+                <span>35% Scoring Weight</span>
+              </div>
+              <span className="text-xs text-slate-500 group-hover:text-purple-400 transition-colors flex items-center gap-1 font-medium">
+                {bookmarkedRules[2] ? "Bookmarked ✓" : "Save Rule"}
+              </span>
             </div>
           </div>
 
-          {/* Box 3: Quantified Achievement Bullets */}
-          <div className="bg-[#0f1422] border border-slate-800 rounded-2xl p-6 sm:p-7 flex flex-col justify-between hover:border-emerald-500/40 hover:shadow-lg hover:shadow-emerald-500/5 transition group">
+          {/* Card 3: Quantified Achievement Bullets */}
+          <div className="bg-[#0f1422] border border-slate-800 rounded-3xl p-6 sm:p-7 flex flex-col justify-between hover:border-emerald-500/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/15 group relative overflow-visible cursor-pointer">
+            {/* Hanging Bookmark Ribbon */}
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleBookmark(3);
+              }}
+              className="absolute -top-3.5 right-6 z-20 cursor-pointer group/bookmark"
+              title={bookmarkedRules[3] ? "Saved in your bookmarks" : "Click to bookmark this rule"}
+            >
+              <div
+                style={{ clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 50% 82%, 0% 100%)" }}
+                className={`w-9 h-14 sm:w-10 sm:h-16 flex flex-col items-center pt-2.5 transition-all duration-300 ease-out group-hover:translate-y-1.5 shadow-lg ${
+                  bookmarkedRules[3]
+                    ? "bg-gradient-to-b from-emerald-500 to-emerald-700 text-white shadow-emerald-500/40"
+                    : "bg-gradient-to-b from-emerald-600 to-emerald-800 text-white/90 group-hover/bookmark:from-emerald-500 group-hover/bookmark:to-emerald-700 shadow-emerald-600/30"
+                }`}
+              >
+                {bookmarkedRules[3] ? (
+                  <BookmarkCheck className="w-4 h-4 fill-current animate-bounce" />
+                ) : (
+                  <Bookmark className="w-4 h-4 transition-transform group-hover/bookmark:scale-110" />
+                )}
+                <span className="text-[9px] font-mono font-bold tracking-tighter mt-1 opacity-90">
+                  03
+                </span>
+              </div>
+            </div>
+
+            {/* Top Interactive Graphic Preview Box */}
+            <div className="bg-[#080b12] rounded-2xl p-4 border border-slate-800/80 mb-5 relative overflow-hidden group-hover:border-emerald-500/30 transition-colors">
+              <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-slate-800/80">
+                <span className="text-[10px] font-mono text-slate-400">STAR_Metric_Lift</span>
+                <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                  +42% Latency
+                </span>
+              </div>
+              <div className="space-y-1.5">
+                <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                  <div className="bg-gradient-to-r from-emerald-400 to-teal-400 h-full rounded-full w-4/5 transition-all duration-500 group-hover:w-full" />
+                </div>
+                <div className="flex justify-between text-[9px] font-mono text-slate-500">
+                  <span>Action: Architected</span>
+                  <span>Impact: 1.5M Req</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Card Body */}
             <div>
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400 mb-5">
-                <Award className="w-5 h-5" />
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-400">
+                  Rule 03 • Impact
+                </span>
               </div>
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-emerald-400 mb-1.5">
-                Rule 03 • Impact
-              </div>
-              <h3 className="text-lg font-serif font-medium text-white mb-2.5 group-hover:text-emerald-300 transition-colors">
+              <h3 className="text-xl font-serif font-medium text-white mb-2.5 group-hover:text-emerald-300 transition-colors">
                 Quantified Achievement Bullets
               </h3>
               <p className="text-slate-400 text-sm leading-relaxed mb-6 font-sans">
                 Begin every bullet with an active verb (Architected, Deployed, Reduced) followed by specific metrics (%, $, latency, user volume). Resumes with measurable impact receive significantly higher semantic rankings.
               </p>
             </div>
-            <div className="flex items-center gap-2 text-xs text-emerald-300 font-semibold bg-emerald-500/10 py-1.5 px-3 rounded-lg border border-emerald-500/20 w-fit">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>3x Interview Callback Rate</span>
+
+            {/* Card Footer Bar */}
+            <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs text-emerald-300 font-semibold bg-emerald-500/10 py-1.5 px-3 rounded-xl border border-emerald-500/20">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>3x Interview Callback Rate</span>
+              </div>
+              <span className="text-xs text-slate-500 group-hover:text-emerald-400 transition-colors flex items-center gap-1 font-medium">
+                {bookmarkedRules[3] ? "Bookmarked ✓" : "Save Rule"}
+              </span>
             </div>
           </div>
         </div>
 
         {/* 4th Box: Interactive Detailed Resume Format Specifications */}
-        <div className="bg-[#0f1422] border border-slate-800 rounded-2xl p-6 sm:p-8 mb-12 transition-all duration-300 hover:border-slate-700 shadow-xl">
+        <div className="bg-[#0f1422] border border-slate-800 rounded-3xl p-6 sm:p-8 mb-12 transition-all duration-300 hover:border-slate-700 shadow-xl">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/25 flex items-center justify-center text-sky-400 flex-shrink-0 mt-0.5">
@@ -129,7 +306,7 @@ const AtsBlueprintSection = () => {
             <button
               type="button"
               onClick={() => setShowFormatDetails(!showFormatDetails)}
-              className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold transition flex items-center gap-2 cursor-pointer flex-shrink-0 shadow-md shadow-indigo-600/25"
+              className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold transition flex items-center gap-2 cursor-pointer flex-shrink-0 shadow-md shadow-indigo-600/25"
             >
               <span>{showFormatDetails ? "Hide Format Details" : "View Format Details"}</span>
               <ChevronDown
@@ -148,7 +325,7 @@ const AtsBlueprintSection = () => {
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {/* Detail 1: Typography */}
-              <div className="bg-[#090d16] border border-slate-800/80 rounded-xl p-5 hover:border-slate-700 transition">
+              <div className="bg-[#090d16] border border-slate-800/80 rounded-2xl p-5 hover:border-slate-700 transition">
                 <div className="flex items-center gap-2.5 text-indigo-300 text-sm font-semibold mb-2">
                   <Type className="w-4 h-4 text-indigo-400" />
                   <span>Approved Fonts & Font Sizing</span>
@@ -164,7 +341,7 @@ const AtsBlueprintSection = () => {
               </div>
 
               {/* Detail 2: Margins & Spacing */}
-              <div className="bg-[#090d16] border border-slate-800/80 rounded-xl p-5 hover:border-slate-700 transition">
+              <div className="bg-[#090d16] border border-slate-800/80 rounded-2xl p-5 hover:border-slate-700 transition">
                 <div className="flex items-center gap-2.5 text-purple-300 text-sm font-semibold mb-2">
                   <Maximize2 className="w-4 h-4 text-purple-400" />
                   <span>Page Margins & Line Geometry</span>
@@ -180,7 +357,7 @@ const AtsBlueprintSection = () => {
               </div>
 
               {/* Detail 3: Date Formats */}
-              <div className="bg-[#090d16] border border-slate-800/80 rounded-xl p-5 hover:border-slate-700 transition">
+              <div className="bg-[#090d16] border border-slate-800/80 rounded-2xl p-5 hover:border-slate-700 transition">
                 <div className="flex items-center gap-2.5 text-emerald-300 text-sm font-semibold mb-2">
                   <Calendar className="w-4 h-4 text-emerald-400" />
                   <span>Date Syntaxes & Chronology</span>
@@ -196,7 +373,7 @@ const AtsBlueprintSection = () => {
               </div>
 
               {/* Detail 4: File Encoding */}
-              <div className="bg-[#090d16] border border-slate-800/80 rounded-xl p-5 hover:border-slate-700 transition">
+              <div className="bg-[#090d16] border border-slate-800/80 rounded-2xl p-5 hover:border-slate-700 transition">
                 <div className="flex items-center gap-2.5 text-sky-300 text-sm font-semibold mb-2">
                   <FileCheck className="w-4 h-4 text-sky-400" />
                   <span>File Type & Text Encoding</span>
@@ -213,7 +390,7 @@ const AtsBlueprintSection = () => {
             </div>
 
             {/* Quick Summary Note */}
-            <div className="mt-4 p-3.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-xs text-slate-300 flex items-center justify-between">
+            <div className="mt-4 p-3.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-slate-300 flex items-center justify-between">
               <span>Following these 4 format standards guarantees clean text extraction across Workday, Taleo, Greenhouse, and Lever.</span>
               <Link to="/ats-rules" className="text-indigo-400 font-semibold underline hover:text-white ml-3 flex-shrink-0">
                 Read Full Rules →
@@ -223,7 +400,7 @@ const AtsBlueprintSection = () => {
         </div>
 
         {/* Guides Footer Navigation Card */}
-        <div className="bg-[#0f1422] border border-slate-800 rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg">
+        <div className="bg-[#0f1422] border border-slate-800 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg">
           <div>
             <h4 className="text-base font-serif font-medium text-white mb-1">
               Want to see these rules in a complete template?
