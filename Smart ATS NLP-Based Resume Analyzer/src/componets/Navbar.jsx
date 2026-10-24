@@ -13,13 +13,26 @@ const Navbar = () => {
             <NavCard />
           </Link>
 
-          <div className='flex gap-3 sm:gap-5 items-center'>
+          <div className='flex gap-2 sm:gap-5 items-center'>
+            <Link
+              to="/ats-rules"
+              className='text-xs sm:text-sm font-semibold text-gray-300 hover:text-indigo-400 transition hidden md:inline-flex items-center gap-1.5'
+            >
+              ATS Rules
+            </Link>
+            <Link
+              to="/cv-standards"
+              className='text-xs sm:text-sm font-semibold text-gray-300 hover:text-purple-400 transition hidden md:inline-flex items-center gap-1.5'
+            >
+              CV Standards
+            </Link>
+
             {token ? (
               <>
-                <Link className='font-bold text-white text-sm sm:text-base hover:text-indigo-400 transition' to="/dashboard">
+                <Link className='font-bold text-white text-xs sm:text-sm hover:text-indigo-400 transition' to="/dashboard">
                   Dashboard
                 </Link>
-                <Link className='font-bold text-white text-sm sm:text-base hover:text-indigo-400 transition' to="/history">
+                <Link className='font-bold text-white text-xs sm:text-sm hover:text-indigo-400 transition' to="/history">
                   History
                 </Link>
                 <button
@@ -34,11 +47,17 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <Link className='font-bold text-gray-300 hover:text-white text-sm sm:text-base transition' to="/login">
+                <Link
+                  to="/ats-rules"
+                  className='text-xs font-semibold text-gray-400 hover:text-white transition md:hidden'
+                >
+                  Rules
+                </Link>
+                <Link className='font-bold text-gray-300 hover:text-white text-xs sm:text-sm transition' to="/login">
                   Log in
                 </Link>
                 <Link to="/register">
-                  <button className='bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-1.5 sm:py-2 px-3.5 sm:px-4 text-xs sm:text-sm rounded-xl cursor-pointer shadow-md shadow-indigo-600/20 transition'>
+                  <button className='bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-1.5 sm:py-2 px-3 sm:px-4 text-xs sm:text-sm rounded-xl cursor-pointer shadow-md shadow-indigo-600/20 transition'>
                     Get Started
                   </button>
                 </Link>

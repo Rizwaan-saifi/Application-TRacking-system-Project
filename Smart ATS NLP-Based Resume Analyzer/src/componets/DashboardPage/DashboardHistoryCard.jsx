@@ -53,6 +53,26 @@ const DashboardHistoryCard = () => {
             <Sparkles className="w-4 h-4 text-indigo-400" />
             <span className="hidden sm:inline">Latest</span> Report
           </Link>
+          <Link
+            to="/ats-rules"
+            className={`hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition ${
+              location.pathname === "/ats-rules"
+                ? "bg-indigo-600 text-white"
+                : "text-gray-400 hover:text-white hover:bg-gray-900"
+            }`}
+          >
+            ATS Rules
+          </Link>
+          <Link
+            to="/cv-standards"
+            className={`hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition ${
+              location.pathname === "/cv-standards"
+                ? "bg-purple-600 text-white"
+                : "text-gray-400 hover:text-white hover:bg-gray-900"
+            }`}
+          >
+            CV Standards
+          </Link>
         </nav>
 
         {/* User / Auth State */}
