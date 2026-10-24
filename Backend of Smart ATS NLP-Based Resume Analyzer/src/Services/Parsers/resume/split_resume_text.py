@@ -1,7 +1,15 @@
 import os
 import re
-from Services.Parsers.resume.resume_parse import extract_raw_text_from_pdf, extract_raw_text_from_docx
-from Services.Parsers.resume.resume_key_sec_ext import extract_resume_keywords_via_llm
+try:
+    from src.Services.Parsers.resume.resume_parse import extract_raw_text_from_pdf, extract_raw_text_from_docx
+    from src.Services.Parsers.resume.resume_key_sec_ext import extract_resume_keywords_via_llm
+except ModuleNotFoundError:
+    try:
+        from Services.Parsers.resume.resume_parse import extract_raw_text_from_pdf, extract_raw_text_from_docx
+        from Services.Parsers.resume.resume_key_sec_ext import extract_resume_keywords_via_llm
+    except ModuleNotFoundError:
+        from resume_parse import extract_raw_text_from_pdf, extract_raw_text_from_docx
+        from resume_key_sec_ext import extract_resume_keywords_via_llm
 # ---------------------------------------------------------
 # STEP 2: RAW TEXT EXTRACTOR ROUTER
 # ---------------------------------------------------------
@@ -78,34 +86,25 @@ def parse_text_into_sections(raw_text: str) -> dict:
 # EXECUTION / DRIVER CODE - CODE CHECK
 # ---------------------------------------------------------
 
-# if __name__ == "__main__":
-
-    # Test Path (Pass PDF or DOCX)
+def run_sync_test():
     file_path = "/home/ro/Code_X/desktop/Working Area/CV.pdf"
-
+    if not os.path.exists(file_path):
+        return
     try:
-        # Phase 1: Raw Text Extraction
         raw_text = get_raw_resume_text(file_path)
         print("\n[SUCCESS] Raw Text Extracted Successfully!")
         print(f"Total Character Length: {len(raw_text)}")
-
-        # Phase 2: Section Splitting
         parsed_sections = parse_text_into_sections(raw_text)
-
-        # Output Display
         print("\n" + "=" * 50)
         print("             PARSED RESUME SECTIONS             ")
         print("=" * 50)
-
         for section_name, section_content in parsed_sections.items():
             print(f"\n--- [ SECTION: {section_name.upper()} ] ---")
             if section_content.strip():
                 print(section_content)
             else:
                 print("(No content found for this section)")
-
         print("\n" + "=" * 50)
-
     except Exception as err:
         print(f"\n[ERROR] Pipeline Failed: {str(err)}")
 

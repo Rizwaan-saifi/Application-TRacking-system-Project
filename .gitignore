@@ -1,3 +1,71 @@
-Backend of Smart ATS NLP-Based Resu.../env/
-Smart ATS NLP-Based Resume Analyzer/node_modules/
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# C extensions
+*.so
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+Backend of Smart ATS NLP-Based Resume Analyzer/env/
+
+# Environment variables & secrets
 .env
+.env.*
+!.env.example
+
+# Node / Frontend
+node_modules/
+Smart ATS NLP-Based Resume Analyzer/node_modules/
+Smart ATS NLP-Based Resume Analyzer/dist/
+dist/
+dist-ssr/
+*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Editor & OS files
+.DS_Store
+Thumbs.db
+.idea/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/

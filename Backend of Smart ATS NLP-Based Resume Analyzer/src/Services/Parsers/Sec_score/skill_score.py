@@ -1,7 +1,13 @@
 import os
 import json
 from typing import List, Dict, Any
-from semantic import global_semantic_model
+try:
+    from src.Services.Parsers.Sec_score.semantic import global_semantic_model
+except ModuleNotFoundError:
+    try:
+        from Services.Parsers.Sec_score.semantic import global_semantic_model
+    except ModuleNotFoundError:
+        from semantic import global_semantic_model
 from sklearn.metrics.pairwise import cosine_similarity
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
@@ -34,11 +40,16 @@ async def call_gemini_for_tier3_validation(unmatched_skills: List[str], full_res
     if not unmatched_skills:
         return []
 
+    api_key = os.getenv("LLM_KEY")
+    if not api_key:
+        print("[WARN] LLM_KEY is not configured. Skipping Tier 3 LLM skills validation.")
+        return []
+
     try:
         from google import genai
         from google.genai import types
 
-        client = genai.Client(api_key=os.getenv("LLM_KEY"))
+        client = genai.Client(api_key=api_key)
 
         prompt = f"""
         You are an advanced ATS (Applicant Tracking System) semantic intelligence engine.

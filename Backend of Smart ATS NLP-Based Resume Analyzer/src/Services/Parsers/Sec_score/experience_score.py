@@ -3,7 +3,13 @@ import json
 from typing import List, Dict, Any
 from sklearn.metrics.pairwise import cosine_similarity
 from pydantic import BaseModel, Field
-from semantic import global_semantic_model
+try:
+    from src.Services.Parsers.Sec_score.semantic import global_semantic_model
+except ModuleNotFoundError:
+    try:
+        from Services.Parsers.Sec_score.semantic import global_semantic_model
+    except ModuleNotFoundError:
+        from semantic import global_semantic_model
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -34,11 +40,16 @@ async def call_gemini_for_experience_llm(
     """
     Tier 3: Triggered only when semantic score is between 40% and 84%.
     """
+    api_key = os.getenv("LLM_KEY")
+    if not api_key:
+        print("[WARN] LLM_KEY is not configured. Defaulting Tier 3 LLM score to 50.0.")
+        return {"total_llm_score": 50, "reasoning_summary": "LLM_KEY not configured"}
+
     try:
         from google import genai
         from google.genai import types
 
-        client = genai.Client(api_key=os.getenv("LLM_KEY"))
+        client = genai.Client(api_key=api_key)
         resume_exp_text = "\n".join(resume_experience_blocks)
 
         prompt = f"""

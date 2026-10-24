@@ -8,7 +8,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Global shared model import (RAM saving ke liye)
-from semantic import global_semantic_model
+try:
+    from src.Services.Parsers.Sec_score.semantic import global_semantic_model
+except ModuleNotFoundError:
+    try:
+        from Services.Parsers.Sec_score.semantic import global_semantic_model
+    except ModuleNotFoundError:
+        from semantic import global_semantic_model
 
 
 # ---------------------------------------------------------
@@ -34,11 +40,16 @@ async def call_gemini_for_responsibilities_llm(
     """
     Tier 3: Triggered for Responsibilities when semantic score is between 40% and 84%.
     """
+    api_key = os.getenv("LLM_KEY")
+    if not api_key:
+        print("[WARN] LLM_KEY is not configured. Defaulting Tier 3 LLM score to 50.0.")
+        return {"total_llm_score": 50, "reasoning_summary": "LLM_KEY not configured"}
+
     try:
         from google import genai
         from google.genai import types
 
-        client = genai.Client(API_KEY = os.getenv("LLM_KEY"))
+        client = genai.Client(api_key=api_key)
         resume_actions_text = "\n".join(resume_action_points)
 
         prompt = f"""
@@ -131,7 +142,7 @@ async def evaluate_responsibilities_section(
     # Rule 1: Score < 40% -> Direct Score = 0
     if tier2_score < 40.0:
         evaluation_tier = "Tier 2 (Low Match - Score set to 0)"
-        base_score = tier2_score
+        base_score = 0.0
 
     # Rule 2: Score >= 85% -> Skip LLM, use semantic score directly
     elif tier2_score >= 85.0:

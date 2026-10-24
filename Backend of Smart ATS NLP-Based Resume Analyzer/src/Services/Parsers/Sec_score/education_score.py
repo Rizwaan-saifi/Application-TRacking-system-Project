@@ -8,7 +8,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Global shared model import (RAM saving ke liye)
-from semantic import global_semantic_model
+try:
+    from src.Services.Parsers.Sec_score.semantic import global_semantic_model
+except ModuleNotFoundError:
+    try:
+        from Services.Parsers.Sec_score.semantic import global_semantic_model
+    except ModuleNotFoundError:
+        from semantic import global_semantic_model
 
 
 # ---------------------------------------------------------
@@ -33,11 +39,16 @@ async def call_gemini_for_education_llm(
     """
     Tier 3: Triggered for remaining unmatched education items using LLM.
     """
+    api_key = os.getenv("LLM_KEY")
+    if not api_key:
+        print("[WARN] LLM_KEY is not configured. Skipping Tier 3 LLM education equivalency.")
+        return {"is_valid_equivalency": False, "reasoning_summary": "LLM_KEY not configured"}
+
     try:
         from google import genai
         from google.genai import types
 
-        client = genai.Client(api_key=os.getenv("LLM_KEY"))
+        client = genai.Client(api_key=api_key)
         candidate_edu_text = ", ".join(candidate_education_list)
 
         prompt = f"""
