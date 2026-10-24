@@ -17,7 +17,7 @@ import {
   FileUp,
   X
 } from "lucide-react";
-import { resumeService } from "../services/api";
+import { resumeService, setPendingAnalysis } from "../services/api";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -33,7 +33,6 @@ const DashboardPage = () => {
 
   // UI State
   const [isDragging, setIsDragging] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [loadingSample, setLoadingSample] = useState(false);
   const [error, setError] = useState("");
   const [history, setHistory] = useState([]);
@@ -119,8 +118,8 @@ const DashboardPage = () => {
     }
   };
 
-  // Submit Analysis
-  const handleAnalyze = async (e) => {
+  // Submit Analysis -> Immediately transitions to /loading processing screen
+  const handleAnalyze = (e) => {
     e.preventDefault();
     setError("");
 
@@ -139,35 +138,20 @@ const DashboardPage = () => {
       return;
     }
 
-    setLoading(true);
+    const payload = {
+      inputMode,
+      selectedFile,
+      resumeText,
+      jobDescription,
+      jobTitle: jobTitle || "Target Role",
+      company: company || "Target Company",
+    };
 
-    try {
-      let result;
-      if (inputMode === "file" && selectedFile) {
-        const formData = new FormData();
-        formData.append("resume_file", selectedFile);
-        formData.append("job_description", jobDescription);
-        formData.append("job_title", jobTitle || "Target Role");
-        formData.append("company", company || "Target Company");
-        result = await resumeService.analyzeFile(formData);
-      } else {
-        result = await resumeService.analyzeJSON({
-          resume_text: resumeText,
-          job_description: jobDescription,
-          job_title: jobTitle || "Target Role",
-          company: company || "Target Company",
-        });
-      }
+    // Store in memory and state
+    setPendingAnalysis(payload);
 
-      // Navigate to analysis report page
-      navigate("/analysis", { state: { analysisResult: result } });
-    } catch (err) {
-      console.error("Analysis Error:", err);
-      const detail = err.response?.data?.detail || err.message || "Failed to analyze resume.";
-      setError(`Analysis Error: ${detail}`);
-    } finally {
-      setLoading(false);
-    }
+    // Navigate to animated processing loading page
+    navigate("/loading", { state: payload });
   };
 
   return (
@@ -232,7 +216,7 @@ const DashboardPage = () => {
           <button
             type="button"
             onClick={handleLoadSample}
-            disabled={loadingSample || loading}
+            disabled={loadingSample}
             className="px-4 py-2 rounded-xl bg-indigo-600/20 border border-indigo-500/40 hover:bg-indigo-600/30 text-indigo-300 text-xs sm:text-sm font-semibold transition flex items-center gap-2 cursor-pointer"
           >
             <Sparkles className={`w-4 h-4 ${loadingSample ? "animate-spin" : ""}`} />
@@ -413,24 +397,14 @@ const DashboardPage = () => {
             </div>
           </div>
 
-          {/* Action Button */}
+          {/* Action Button -> Transitions to /loading */}
           <div className="flex justify-center pt-2">
             <button
               type="submit"
-              disabled={loading}
-              className="w-full sm:w-auto px-10 py-4 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-gray-950 font-black text-base shadow-xl shadow-amber-500/10 hover:shadow-amber-500/20 transition transform active:scale-98 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full sm:w-auto px-10 py-4 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-gray-950 font-black text-base shadow-xl shadow-amber-500/10 hover:shadow-amber-500/20 transition transform active:scale-98 cursor-pointer flex items-center justify-center gap-2"
             >
-              {loading ? (
-                <>
-                  <RefreshCw className="w-5 h-5 animate-spin" />
-                  <span>Evaluating with 3-Tier Engine...</span>
-                </>
-              ) : (
-                <>
-                  <Zap className="w-5 h-5 fill-current" />
-                  <span>Analyze Candidate Match</span>
-                </>
-              )}
+              <Zap className="w-5 h-5 fill-current" />
+              <span>Analyze Candidate Match</span>
             </button>
           </div>
         </form>

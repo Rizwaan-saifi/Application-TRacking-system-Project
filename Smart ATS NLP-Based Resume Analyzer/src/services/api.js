@@ -42,6 +42,16 @@ export const authService = {
   },
 };
 
+let _pendingAnalysis = null;
+
+export const setPendingAnalysis = (data) => {
+  _pendingAnalysis = data;
+};
+
+export const getPendingAnalysis = () => {
+  return _pendingAnalysis;
+};
+
 export const resumeService = {
   getSample: async () => {
     const res = await api.get("/resume/sample");

@@ -6,6 +6,7 @@ import RagisterPage from "../pages/RagisterPage";
 import DashboardPage from "../pages/DashboardPage.jsx";
 import HistoryPage from "../pages/HistoryPage";
 import AnalysisPage from "../pages/AnalysisPage.jsx";
+import LoadingPage from "../pages/LoadingPage.jsx";
 
 const AppRoutes = () => {
   return (
@@ -14,6 +15,7 @@ const AppRoutes = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RagisterPage />} />
       <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/loading" element={<LoadingPage />} />
       <Route path="/history" element={<HistoryPage />} />
       <Route path="/analysis" element={<AnalysisPage />} />
     </Routes>
