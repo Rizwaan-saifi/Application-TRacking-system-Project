@@ -52,17 +52,13 @@ const AtsRulesPage = () => {
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20">
         {/* Hero Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs sm:text-sm font-semibold mb-6">
-            <Sparkles className="w-4 h-4" />
-            <span>Master The Algorithms</span>
+          <div className="inline-block text-xs uppercase tracking-widest text-neutral-400 font-medium mb-3">
+            Algorithmic Screening Guidelines
           </div>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight">
-            The Golden Rules to <br />
-            <span className="bg-gradient-to-r from-indigo-400 via-purple-300 to-amber-300 bg-clip-text text-transparent">
-              Beat Any ATS Machine
-            </span>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif text-white font-normal tracking-tight leading-tight">
+            The Golden Rules to Beat Any ATS Machine
           </h1>
-          <p className="mt-6 text-gray-400 text-base sm:text-lg leading-relaxed">
+          <p className="mt-6 text-neutral-400 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
             Over 75% of resumes are auto-rejected by Applicant Tracking Systems before a human recruiter ever sees them. Learn the strict rules that ensure your CV parses cleanly and scores in the top 5%.
           </p>
 

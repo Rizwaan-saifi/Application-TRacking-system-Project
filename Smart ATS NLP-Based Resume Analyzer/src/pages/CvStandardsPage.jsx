@@ -72,17 +72,13 @@ const CvStandardsPage = () => {
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs sm:text-sm font-semibold mb-6">
-            <BookOpen className="w-4 h-4" />
-            <span>Professional CV Blueprint</span>
+          <div className="inline-block text-xs uppercase tracking-widest text-neutral-400 font-medium mb-3">
+            Industry Standard Blueprint
           </div>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight">
-            Anatomy of an <br />
-            <span className="bg-gradient-to-r from-purple-400 via-indigo-300 to-emerald-300 bg-clip-text text-transparent">
-              Executive-Ready CV & Resume
-            </span>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif text-white font-normal tracking-tight leading-tight">
+            Anatomy of an Executive-Ready CV & Resume
           </h1>
-          <p className="mt-6 text-gray-400 text-base sm:text-lg leading-relaxed">
+          <p className="mt-6 text-neutral-400 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
             The exact section-by-section breakdown that satisfies both automated ATS parsing algorithms (3-Tier evaluation) and elite human hiring managers.
           </p>
 
