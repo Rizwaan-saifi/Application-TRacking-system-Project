@@ -15,7 +15,8 @@ import {
   Clock,
   ArrowRight,
   FileUp,
-  X
+  X,
+  Trash2
 } from "lucide-react";
 import { resumeService, setPendingAnalysis } from "../services/api";
 
@@ -59,6 +60,27 @@ const DashboardPage = () => {
   useEffect(() => {
     fetchHistory();
   }, []);
+
+  const handleDeleteHistory = async (e, id) => {
+    e.stopPropagation();
+    if (!window.confirm("Delete this analysis record?")) return;
+
+    try {
+      await resumeService.deleteAnalysis(id);
+      const updated = history.filter((item) => item.id !== id);
+      setHistory(updated);
+      if (updated.length > 0) {
+        const scores = updated.map((r) => r.ats_score);
+        const best = Math.max(...scores);
+        const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+        setMetrics({ total: updated.length, best: Math.round(best), avg });
+      } else {
+        setMetrics({ total: 0, best: 0, avg: 0 });
+      }
+    } catch (err) {
+      console.error("Failed to delete history item:", err);
+    }
+  };
 
   // Handle Drag & Drop
   const handleDragOver = (e) => {
@@ -448,6 +470,11 @@ const DashboardPage = () => {
                     className="bg-gray-900/60 border border-gray-800 hover:border-gray-700 rounded-2xl p-5 flex justify-between items-center transition cursor-pointer group shadow-sm hover:shadow-md"
                   >
                     <div>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="text-[10px] font-semibold text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20 uppercase tracking-wider">
+                          Role from JD
+                        </span>
+                      </div>
                       <h4 className="font-bold text-white text-sm group-hover:text-indigo-300 transition">
                         {item.job_title}
                       </h4>
@@ -458,15 +485,25 @@ const DashboardPage = () => {
                       </div>
                     </div>
 
-                    <div className="text-right flex flex-col items-end">
-                      <div
-                        className={`w-12 h-12 rounded-full border flex items-center justify-center font-black text-sm ${badgeColor}`}
-                      >
-                        {Math.round(item.ats_score)}%
+                    <div className="text-right flex items-center gap-3">
+                      <div className="flex flex-col items-end">
+                        <div
+                          className={`w-12 h-12 rounded-full border flex items-center justify-center font-black text-sm ${badgeColor}`}
+                        >
+                          {Math.round(item.ats_score)}%
+                        </div>
+                        <span className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mt-1">
+                          {item.interpretation}
+                        </span>
                       </div>
-                      <span className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mt-1">
-                        {item.interpretation}
-                      </span>
+
+                      <button
+                        onClick={(e) => handleDeleteHistory(e, item.id)}
+                        className="p-2 text-gray-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition cursor-pointer"
+                        title="Delete from history"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
                 );

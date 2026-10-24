@@ -80,6 +80,14 @@ export const resumeService = {
     const res = await api.get(`/resume/history/${id}`);
     return res.data;
   },
+  deleteAnalysis: async (id) => {
+    const res = await api.delete(`/resume/history/${id}`);
+    return res.data;
+  },
+  clearAllHistory: async () => {
+    const res = await api.delete("/resume/history");
+    return res.data;
+  },
 };
 
 export default api;

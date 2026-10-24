@@ -144,11 +144,46 @@ def parse_resume_sections(raw_text: str) -> Dict[str, Any]:
     }
 
 
+def extract_role_and_company_from_jd(jd_text: str):
+    """Extracts job title / role and company directly from the JD text."""
+    role = None
+    company = None
+
+    # 1. Regex for role
+    m_role = re.search(r'(?:job\s*title|role|position|title)\s*[:\-]\s*([^\n\r]+)', jd_text, re.IGNORECASE)
+    if m_role:
+        role = m_role.group(1).strip()
+        role = re.split(r'[\(\[\{]', role)[0].strip()
+
+    if not role:
+        m_seek = re.search(r'(?:seeking|looking for|hiring)\s+(?:an?|our)\s+([A-Z][A-Za-z0-9\s\-/]+?)(?:\s+to|\s+who|\s+with|\.|\n)', jd_text, re.IGNORECASE)
+        if m_seek:
+            role = m_seek.group(1).strip()
+
+    if not role or len(role) < 3 or len(role) > 60:
+        first_line = jd_text.strip().splitlines()[0].strip()
+        if len(first_line) < 50 and not any(kw in first_line.lower() for kw in ["about", "summary", "overview", "description"]):
+            role = first_line
+        else:
+            role = "Software Engineer"
+
+    # Company
+    m_comp = re.search(r'company\s*[:\-]\s*([^\n\r]+)', jd_text, re.IGNORECASE)
+    if m_comp:
+        company = m_comp.group(1).strip()
+    else:
+        company = "Target Company"
+
+    return role, company
+
+
 def parse_job_description_sections(jd_text: str) -> Dict[str, Any]:
     """Segments a Job Description into required skills, experience, duties, and education."""
     skills = extract_skills_from_text(jd_text)
     if not skills:
         skills = ["Python", "FastAPI", "SQL", "Docker", "Git"]
+
+    role_title, company_name = extract_role_and_company_from_jd(jd_text)
         
     lines = [line.strip() for line in jd_text.splitlines() if line.strip()]
     
@@ -192,5 +227,7 @@ def parse_job_description_sections(jd_text: str) -> Dict[str, Any]:
         "job_skills": skills,
         "jd_experience_text": jd_exp_text,
         "jd_responsibilities_text": jd_resp_text,
-        "jd_education_requirements": edu_lines
+        "jd_education_requirements": edu_lines,
+        "extracted_role": role_title,
+        "extracted_company": company_name
     }

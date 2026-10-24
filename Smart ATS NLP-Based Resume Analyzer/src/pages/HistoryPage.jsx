@@ -9,7 +9,9 @@ import {
   TrendingUp,
   Award,
   FileText,
-  Calendar
+  Calendar,
+  Trash2,
+  AlertCircle
 } from "lucide-react";
 import { resumeService } from "../services/api";
 
@@ -18,20 +20,54 @@ const HistoryPage = () => {
   const [history, setHistory] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState(null);
+  const [clearing, setClearing] = useState(false);
+
+  const fetchHistory = async () => {
+    try {
+      const data = await resumeService.getHistory();
+      setHistory(data.history || []);
+    } catch (err) {
+      console.error("Failed to load history:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        const data = await resumeService.getHistory();
-        setHistory(data.history || []);
-      } catch (err) {
-        console.error("Failed to load history:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchHistory();
   }, []);
+
+  const handleDeleteRecord = async (e, id) => {
+    e.stopPropagation();
+    if (!window.confirm("Are you sure you want to delete this analysis record?")) return;
+
+    setDeletingId(id);
+    try {
+      await resumeService.deleteAnalysis(id);
+      setHistory((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      console.error("Failed to delete record:", err);
+      alert("Failed to delete record. Please check backend connection.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const handleClearAll = async () => {
+    if (!window.confirm("Are you sure you want to delete ALL analysis history? This cannot be undone.")) return;
+
+    setClearing(true);
+    try {
+      await resumeService.clearAllHistory();
+      setHistory([]);
+    } catch (err) {
+      console.error("Failed to clear history:", err);
+      alert("Failed to clear history.");
+    } finally {
+      setClearing(false);
+    }
+  };
 
   const filtered = history.filter((item) => {
     const query = search.toLowerCase();
@@ -64,20 +100,34 @@ const HistoryPage = () => {
             </button>
             <h1 className="text-3xl font-extrabold tracking-tight">Analysis History</h1>
             <p className="text-gray-400 text-sm mt-1">
-              Complete archive of your resume-to-job-description evaluations and scores.
+              Job roles extracted directly from Job Descriptions and their candidate match scores.
             </p>
           </div>
 
-          {/* Search Box */}
-          <div className="relative w-full sm:w-72">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search role or company..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-gray-900 border border-gray-800 rounded-xl pl-10 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition"
-            />
+          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+            {/* Search Box */}
+            <div className="relative flex-1 sm:w-64">
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search extracted role..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full bg-gray-900 border border-gray-800 rounded-xl pl-10 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition"
+              />
+            </div>
+
+            {/* Clear All Button */}
+            {history.length > 0 && (
+              <button
+                onClick={handleClearAll}
+                disabled={clearing}
+                className="px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 cursor-pointer"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Clear All</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -107,10 +157,16 @@ const HistoryPage = () => {
                       <FileText className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-white text-base group-hover:text-indigo-400 transition">
-                        {item.job_title}
-                      </h3>
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400 mt-1">
+                      {/* Extracted Role from JD */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-md border border-indigo-500/20">
+                          Role from JD
+                        </span>
+                        <h3 className="font-bold text-white text-base group-hover:text-indigo-400 transition">
+                          {item.job_title}
+                        </h3>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400 mt-1.5">
                         <span className="text-gray-300 font-medium">{item.company}</span>
                         <span>•</span>
                         <span className="flex items-center gap-1">
@@ -122,7 +178,7 @@ const HistoryPage = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between sm:justify-end gap-6">
+                  <div className="flex items-center justify-between sm:justify-end gap-4">
                     <div className="text-right">
                       <div
                         className={`inline-flex px-3 py-1 rounded-full border text-xs font-bold ${getBadgeStyle(
@@ -132,6 +188,16 @@ const HistoryPage = () => {
                         {Math.round(item.ats_score)}% • {item.interpretation}
                       </div>
                     </div>
+
+                    {/* Delete button */}
+                    <button
+                      onClick={(e) => handleDeleteRecord(e, item.id)}
+                      disabled={deletingId === item.id}
+                      className="p-2 rounded-xl text-gray-500 hover:text-rose-400 hover:bg-rose-500/10 transition cursor-pointer"
+                      title="Delete this analysis"
+                    >
+                      <Trash2 className={`w-4 h-4 ${deletingId === item.id ? "animate-spin" : ""}`} />
+                    </button>
 
                     <div className="text-gray-500 group-hover:text-indigo-400 transition">
                       <ChevronRight className="w-5 h-5" />

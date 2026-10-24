@@ -115,10 +115,14 @@ async def analyze_resume_json(
             resume_education_blocks=resume_data["education_blocks"],
         )
 
+        # Determine final role and company from JD text if not specified
+        final_role = payload.job_title if payload.job_title and payload.job_title not in ["Target Role", "Software Engineer", ""] else jd_data.get("extracted_role", "Software Engineer")
+        final_company = payload.company if payload.company and payload.company not in ["Target Company", ""] else jd_data.get("extracted_company", "Target Company")
+
         # Persist record in database
         analysis_record = AnalysisHistory(
-            job_title=payload.job_title or "Software Engineer",
-            company=payload.company or "Target Company",
+            job_title=final_role,
+            company=final_company,
             ats_score=result["total_ats_score"],
             interpretation=result["score_interpretation"],
             result_json=json.dumps(result)
@@ -170,9 +174,12 @@ async def analyze_resume_file(
             resume_education_blocks=resume_data["education_blocks"],
         )
 
+        final_role = job_title if job_title and job_title not in ["Target Role", "Software Engineer", ""] else jd_data.get("extracted_role", "Software Engineer")
+        final_company = company if company and company not in ["Target Company", ""] else jd_data.get("extracted_company", "Target Company")
+
         analysis_record = AnalysisHistory(
-            job_title=job_title or "Software Engineer",
-            company=company or "Target Company",
+            job_title=final_role,
+            company=final_company,
             ats_score=result["total_ats_score"],
             interpretation=result["score_interpretation"],
             result_json=json.dumps(result)
@@ -224,3 +231,20 @@ async def get_analysis_by_id(record_id: int, db: Session = Depends(get_db)):
     data["total_ats_score"] = data.get("total_ats_score", record.ats_score)
     data["score_interpretation"] = data.get("score_interpretation", record.interpretation)
     return data
+
+
+@resume_router.delete("/history/{record_id}", summary="Delete specific analysis record from history")
+async def delete_analysis_record(record_id: int, db: Session = Depends(get_db)):
+    record = db.query(AnalysisHistory).filter(AnalysisHistory.id == record_id).first()
+    if not record:
+        raise HTTPException(status_code=404, detail="Analysis record not found.")
+    db.delete(record)
+    db.commit()
+    return {"success": True, "deleted_id": record_id, "message": "Record deleted successfully"}
+
+
+@resume_router.delete("/history", summary="Clear all analysis history")
+async def clear_all_history(db: Session = Depends(get_db)):
+    count = db.query(AnalysisHistory).delete()
+    db.commit()
+    return {"success": True, "deleted_count": count, "message": "All history records cleared"}
