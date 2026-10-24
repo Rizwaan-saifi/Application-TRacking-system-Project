@@ -92,7 +92,14 @@ const HistoryPage = () => {
               {filtered.map((item) => (
                 <div
                   key={item.id}
-                  onClick={() => navigate("/analysis")}
+                  onClick={async () => {
+                    try {
+                      const fullAnalysis = await resumeService.getAnalysisById(item.id);
+                      navigate("/analysis", { state: { analysisResult: fullAnalysis } });
+                    } catch (err) {
+                      navigate("/analysis");
+                    }
+                  }}
                   className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-800/40 transition cursor-pointer group"
                 >
                   <div className="flex items-start sm:items-center gap-4">

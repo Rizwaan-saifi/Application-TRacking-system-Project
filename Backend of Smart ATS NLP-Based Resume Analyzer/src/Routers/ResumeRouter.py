@@ -209,3 +209,18 @@ async def get_analysis_history(db: Session = Depends(get_db)):
             "created_at": r.created_at.isoformat(),
         })
     return {"history": history, "total": len(history)}
+
+
+@resume_router.get("/history/{record_id}", summary="Get specific analysis details by ID")
+async def get_analysis_by_id(record_id: int, db: Session = Depends(get_db)):
+    record = db.query(AnalysisHistory).filter(AnalysisHistory.id == record_id).first()
+    if not record:
+        raise HTTPException(status_code=404, detail="Analysis record not found.")
+    data = json.loads(record.result_json)
+    data["analysis_id"] = record.id
+    data["job_title"] = record.job_title
+    data["company"] = record.company
+    data["created_at"] = record.created_at.isoformat()
+    data["total_ats_score"] = data.get("total_ats_score", record.ats_score)
+    data["score_interpretation"] = data.get("score_interpretation", record.interpretation)
+    return data

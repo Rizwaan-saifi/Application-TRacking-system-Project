@@ -1,16 +1,13 @@
-import React from 'react'
-import Navbar from './componets/Navbar'
-
-import LandingPage from './pages/LandingPage'
-import AppRoutes from './componets/AppRoutes'
-
+import React from 'react';
+import AppRoutes from './componets/AppRoutes';
+import ErrorBoundary from './componets/ErrorBoundary';
 
 const App = () => {
   return (
-    <>
-      <AppRoutes/>
-    </>
-  )
-}
+    <ErrorBoundary>
+      <AppRoutes />
+    </ErrorBoundary>
+  );
+};
 
-export default App
+export default App;

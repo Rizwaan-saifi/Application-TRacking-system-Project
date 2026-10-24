@@ -76,6 +76,10 @@ export const resumeService = {
     const res = await api.get("/resume/history");
     return res.data;
   },
+  getAnalysisById: async (id) => {
+    const res = await api.get(`/resume/history/${id}`);
+    return res.data;
+  },
 };
 
 export default api;

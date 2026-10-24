@@ -437,7 +437,14 @@ const DashboardPage = () => {
                 return (
                   <div
                     key={item.id}
-                    onClick={() => navigate("/analysis")}
+                    onClick={async () => {
+                      try {
+                        const fullAnalysis = await resumeService.getAnalysisById(item.id);
+                        navigate("/analysis", { state: { analysisResult: fullAnalysis } });
+                      } catch (err) {
+                        navigate("/analysis");
+                      }
+                    }}
                     className="bg-gray-900/60 border border-gray-800 hover:border-gray-700 rounded-2xl p-5 flex justify-between items-center transition cursor-pointer group shadow-sm hover:shadow-md"
                   >
                     <div>
