@@ -115,9 +115,22 @@ async def analyze_resume_json(
             resume_education_blocks=resume_data["education_blocks"],
         )
 
-        # Determine final role and company from JD text if not specified
-        final_role = payload.job_title if payload.job_title and payload.job_title not in ["Target Role", "Software Engineer", ""] else jd_data.get("extracted_role", "Software Engineer")
-        final_company = payload.company if payload.company and payload.company not in ["Target Company", ""] else jd_data.get("extracted_company", "Target Company")
+        # Determine final role and company from JD text
+        extracted_role = jd_data.get("extracted_role")
+        if extracted_role and extracted_role.strip():
+            final_role = extracted_role.strip()
+        elif payload.job_title and payload.job_title.strip() not in ["Target Role", "Software Engineer", ""]:
+            final_role = payload.job_title.strip()
+        else:
+            final_role = "Software Engineer"
+
+        extracted_comp = jd_data.get("extracted_company")
+        if extracted_comp and extracted_comp.strip() and extracted_comp != "Target Company":
+            final_company = extracted_comp.strip()
+        elif payload.company and payload.company.strip() not in ["Target Company", ""]:
+            final_company = payload.company.strip()
+        else:
+            final_company = "Target Company"
 
         # Persist record in database
         analysis_record = AnalysisHistory(
@@ -174,8 +187,21 @@ async def analyze_resume_file(
             resume_education_blocks=resume_data["education_blocks"],
         )
 
-        final_role = job_title if job_title and job_title not in ["Target Role", "Software Engineer", ""] else jd_data.get("extracted_role", "Software Engineer")
-        final_company = company if company and company not in ["Target Company", ""] else jd_data.get("extracted_company", "Target Company")
+        extracted_role = jd_data.get("extracted_role")
+        if extracted_role and extracted_role.strip():
+            final_role = extracted_role.strip()
+        elif job_title and job_title.strip() not in ["Target Role", "Software Engineer", ""]:
+            final_role = job_title.strip()
+        else:
+            final_role = "Software Engineer"
+
+        extracted_comp = jd_data.get("extracted_company")
+        if extracted_comp and extracted_comp.strip() and extracted_comp != "Target Company":
+            final_company = extracted_comp.strip()
+        elif company and company.strip() not in ["Target Company", ""]:
+            final_company = company.strip()
+        else:
+            final_company = "Target Company"
 
         analysis_record = AnalysisHistory(
             job_title=final_role,

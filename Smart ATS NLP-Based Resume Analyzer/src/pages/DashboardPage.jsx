@@ -140,6 +140,34 @@ const DashboardPage = () => {
     }
   };
 
+  // Extract role on the fly from Job Description for live UI feedback
+  const extractClientRole = (text) => {
+    if (!text || text.trim().length < 5) return "";
+    const clean = (t) => t.replace(/^[#*\s\-•:>]+/, "").replace(/[*_`]+/g, "").split(/[\(\[\{]/)[0].trim();
+    const m = text.match(/(?:job\s*(?:title|role|position)|role\s*(?:title|name)?|position\s*(?:title|name)?|title)\s*[:\-]\s*([^\n\r]+)/i);
+    if (m && m[1]) {
+      const c = clean(m[1]);
+      if (c.length >= 3 && c.length <= 60) return c;
+    }
+    const lines = text.split("\n").map(l => clean(l)).filter(Boolean);
+    const keywords = ["engineer", "developer", "analyst", "scientist", "architect", "specialist", "designer", "manager", "lead", "consultant", "administrator", "qa", "devops", "intern", "associate", "programmer"];
+    for (const l of lines.slice(0, 6)) {
+      if (keywords.some(kw => l.toLowerCase().includes(kw)) && l.length >= 4 && l.length <= 60) {
+        if (!l.toLowerCase().includes("responsibilit") && !l.toLowerCase().includes("qualification")) {
+          return l;
+        }
+      }
+    }
+    const seek = text.match(/(?:seeking|looking for|hiring|hire|join our team as|position of|opportunity for)\s+(?:an?|our)?\s*([A-Za-z0-9\s\-/]{3,50}?)(?:\s+(?:to|who|with|for|\.|\n|,|;))/i);
+    if (seek && seek[1]) {
+      const c = clean(seek[1]);
+      if (c.length >= 3 && c.length <= 50) return c;
+    }
+    return lines[0]?.length <= 50 ? lines[0] : "";
+  };
+
+  const detectedRole = extractClientRole(jobDescription);
+
   // Submit Analysis -> Immediately transitions to /loading processing screen
   const handleAnalyze = (e) => {
     e.preventDefault();
@@ -165,7 +193,7 @@ const DashboardPage = () => {
       selectedFile,
       resumeText,
       jobDescription,
-      jobTitle: jobTitle || "Target Role",
+      jobTitle: detectedRole || jobTitle || "Target Role",
       company: company || "Target Company",
     };
 
@@ -416,6 +444,15 @@ const DashboardPage = () => {
                 onChange={(e) => setJobDescription(e.target.value)}
                 className="w-full flex-1 min-h-[260px] bg-gray-950 border border-gray-800 rounded-xl p-4 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition"
               />
+
+              {detectedRole && (
+                <div className="mt-3 flex items-center gap-2 text-xs bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 px-3 py-2 rounded-xl">
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" />
+                  <span>
+                    Detected Job Role from JD: <strong className="text-white font-semibold">{detectedRole}</strong>
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -498,11 +535,12 @@ const DashboardPage = () => {
                       </div>
 
                       <button
+                        type="button"
                         onClick={(e) => handleDeleteHistory(e, item.id)}
-                        className="p-2 text-gray-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition cursor-pointer"
-                        title="Delete from history"
+                        className="p-2 text-gray-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition cursor-pointer flex items-center justify-center"
+                        title="Delete this analysis record"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4 text-rose-400/80 hover:text-rose-400" />
                       </button>
                     </div>
                   </div>

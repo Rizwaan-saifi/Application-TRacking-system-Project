@@ -191,12 +191,14 @@ const HistoryPage = () => {
 
                     {/* Delete button */}
                     <button
+                      type="button"
                       onClick={(e) => handleDeleteRecord(e, item.id)}
                       disabled={deletingId === item.id}
-                      className="p-2 rounded-xl text-gray-500 hover:text-rose-400 hover:bg-rose-500/10 transition cursor-pointer"
-                      title="Delete this analysis"
+                      className="px-2.5 py-1.5 rounded-xl text-gray-400 hover:text-rose-300 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 transition flex items-center gap-1.5 cursor-pointer text-xs"
+                      title="Delete this analysis record"
                     >
-                      <Trash2 className={`w-4 h-4 ${deletingId === item.id ? "animate-spin" : ""}`} />
+                      <Trash2 className={`w-3.5 h-3.5 text-rose-400 ${deletingId === item.id ? "animate-spin" : ""}`} />
+                      <span className="hidden sm:inline font-medium">Delete</span>
                     </button>
 
                     <div className="text-gray-500 group-hover:text-indigo-400 transition">

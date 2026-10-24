@@ -144,34 +144,81 @@ def parse_resume_sections(raw_text: str) -> Dict[str, Any]:
     }
 
 
+def clean_role_string(val: str) -> str:
+    """Strips markdown headers, bullets, special characters, and trailing info."""
+    val = re.sub(r'^[#*\s\-•:>]+', '', val)
+    val = re.sub(r'[*_`]+', '', val)
+    val = re.split(r'[\(\[\{]', val)[0]
+    # Remove leading fluffy adjectives like 'passionate', 'experienced', etc.
+    val = re.sub(r'^(?:passionate|talented|skilled|dynamic|experienced|exceptional|enthusiastic|driven)\s+', '', val, flags=re.IGNORECASE)
+    return val.strip()
+
+
 def extract_role_and_company_from_jd(jd_text: str):
-    """Extracts job title / role and company directly from the JD text."""
+    """Extracts job title / role and company directly from the JD text with multi-layer heuristics."""
     role = None
     company = None
 
-    # 1. Regex for role
-    m_role = re.search(r'(?:job\s*title|role|position|title)\s*[:\-]\s*([^\n\r]+)', jd_text, re.IGNORECASE)
+    ROLE_KEYWORDS = [
+        'engineer', 'developer', 'analyst', 'scientist', 'architect', 'specialist', 
+        'designer', 'manager', 'lead', 'consultant', 'administrator', 'qa', 'devops', 
+        'intern', 'associate', 'programmer', 'sre', 'product manager'
+    ]
+
+    # 1. Regex for explicit label (e.g. "Job Title: Senior React Developer", "Role - Backend Engineer")
+    m_role = re.search(r'(?:job\s*(?:title|role|position)|role\s*(?:title|name)?|position\s*(?:title|name)?|title)\s*[:\-]\s*([^\n\r]+)', jd_text, re.IGNORECASE)
     if m_role:
-        role = m_role.group(1).strip()
-        role = re.split(r'[\(\[\{]', role)[0].strip()
+        cleaned = clean_role_string(m_role.group(1))
+        if len(cleaned) >= 3 and len(cleaned) <= 65:
+            role = cleaned
 
+    # 2. Check the first 5 non-empty lines for common job keywords
     if not role:
-        m_seek = re.search(r'(?:seeking|looking for|hiring)\s+(?:an?|our)\s+([A-Z][A-Za-z0-9\s\-/]+?)(?:\s+to|\s+who|\s+with|\.|\n)', jd_text, re.IGNORECASE)
-        if m_seek:
-            role = m_seek.group(1).strip()
+        lines = [clean_role_string(l) for l in jd_text.splitlines() if l.strip()]
+        for l in lines[:6]:
+            l_lower = l.lower()
+            if any(kw in l_lower for kw in ROLE_KEYWORDS) and len(l) >= 4 and len(l) <= 65:
+                # Avoid matching entire sentence headers like "Responsibilities for the software engineer"
+                if not any(header in l_lower for header in ["responsibilit", "qualification", "requirement", "overview", "about us", "summary"]):
+                    role = l
+                    break
 
-    if not role or len(role) < 3 or len(role) > 60:
-        first_line = jd_text.strip().splitlines()[0].strip()
-        if len(first_line) < 50 and not any(kw in first_line.lower() for kw in ["about", "summary", "overview", "description"]):
-            role = first_line
+    # 3. Seeking / Looking for patterns
+    if not role:
+        m_seek = re.search(r'(?:seeking|looking for|hiring|hire|join our team as|position of|opportunity for)\s+(?:an?|our)?\s*([A-Za-z0-9\s\-/]{3,50}?)(?:\s+(?:to|who|with|for|\.|\n|,|;))', jd_text, re.IGNORECASE)
+        if m_seek:
+            cleaned = clean_role_string(m_seek.group(1))
+            if len(cleaned) >= 3 and len(cleaned) <= 60:
+                role = cleaned
+
+    # 4. Fallback: inspect first clean line
+    if not role:
+        lines = [clean_role_string(l) for l in jd_text.splitlines() if l.strip()]
+        if lines:
+            first_line = lines[0]
+            if len(first_line) <= 50 and not any(kw in first_line.lower() for kw in ["about", "summary", "overview", "description", "http"]):
+                role = first_line
+            else:
+                role = "Software Engineer"
         else:
             role = "Software Engineer"
 
-    # Company
-    m_comp = re.search(r'company\s*[:\-]\s*([^\n\r]+)', jd_text, re.IGNORECASE)
+    # Company Extraction
+    m_comp = re.search(r'(?:company(?:\s*name)?|organization|employer)\s*[:\-]\s*([^\n\r]+)', jd_text, re.IGNORECASE)
     if m_comp:
-        company = m_comp.group(1).strip()
-    else:
+        comp_candidate = re.sub(r'[*_`]+', '', m_comp.group(1)).strip()
+        comp_candidate = re.split(r'[\(\[\{]', comp_candidate)[0].strip()
+        if len(comp_candidate) >= 2 and len(comp_candidate) <= 50:
+            company = comp_candidate
+
+    if not company:
+        m_comp_at = re.search(r'(?:at|about)\s+([A-Z][A-Za-z0-9\s\.\,&\'\-]+?)(?:\s+(?:is|we are|was founded|\.|\n|,))', jd_text)
+        if m_comp_at:
+            cand = m_comp_at.group(1).strip()
+            if 2 <= len(cand) <= 40 and not any(w in cand.lower() for w in ["the", "this", "our", "your", "a"]):
+                company = cand
+
+    if not company:
         company = "Target Company"
 
     return role, company
