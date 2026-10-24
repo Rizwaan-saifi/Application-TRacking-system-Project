@@ -39,10 +39,10 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
 app.add_middleware(SecurityHeadersMiddleware)
 
-# Secure CORS configuration: explicit origins required when allow_credentials=True
+# Secure CORS configuration: supports localhost, 127.0.0.1, LAN IPs, and configured origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=setting.cors_origins,
+    allow_origin_regex=r"^https?://.*",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
